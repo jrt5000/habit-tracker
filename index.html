@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Four444</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#4F46E5">
+  <meta name="description" content="Personal habit tracking app">
+
+  <!-- iOS Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Four444">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%234F46E5' width='100' height='100' rx='20'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white'>✓</text></svg>">
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { margin: 0; padding: 0; overflow-x: hidden; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    const CheckCircle = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+    const Circle = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth={2} /></svg>;
+    const Calendar = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" strokeWidth={2}/><line x1="16" y1="2" x2="16" y2="6" strokeWidth={2}/><line x1="8" y1="2" x2="8" y2="6" strokeWidth={2}/><line x1="3" y1="10" x2="21" y2="10" strokeWidth={2}/></svg>;
+    const TrendingUp = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" strokeWidth={2}/><polyline points="17 6 23 6 23 12" strokeWidth={2}/></svg>;
+    const Download = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
+    const ChevronLeft = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>;
+    const ChevronRight = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>;
+    const ChevronUp = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>;
+    const ChevronDown = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>;
+    const Play = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" strokeWidth={2}/></svg>;
+    const Pause = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" strokeWidth={2}/><rect x="14" y="4" width="4" height="16" strokeWidth={2}/></svg>;
+    const Square = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" strokeWidth={2}/></svg>;
+    const Grid = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" strokeWidth={2}/><rect x="14" y="3" width="7" height="7" strokeWidth={2}/><rect x="3" y="14" width="7" height="7" strokeWidth={2}/><rect x="14" y="14" width="7" height="7" strokeWidth={2}/></svg>;
+    const List = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6" strokeWidth={2}/><line x1="8" y1="12" x2="21" y2="12" strokeWidth={2}/><line x1="8" y1="18" x2="21" y2="18" strokeWidth={2}/><line x1="3" y1="6" x2="3.01" y2="6" strokeWidth={2}/><line x1="3" y1="12" x2="3.01" y2="12" strokeWidth={2}/><line x1="3" y1="18" x2="3.01" y2="18" strokeWidth={2}/></svg>;
+    const X = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" strokeWidth={2}/><line x1="6" y1="6" x2="18" y2="18" strokeWidth={2}/></svg>;
+    const Book = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
+    const Target = ({className}) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth={2}/><circle cx="12" cy="12" r="6" strokeWidth={2}/><circle cx="12" cy="12" r="2" strokeWidth={2}/></svg>;
+
+    function HabitTracker() {
+      const getLocalDateString = (date = new Date()) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      const [trackedData, setTrackedData] = useState(() => {
+        try {
+          const saved = localStorage.getItem('habitTrackerData288');
+          return saved ? JSON.parse(saved) : {};
+        } catch (e) {
+          return {};
+        }
+      });
+      
+      const [taskOrder, setTaskOrder] = useState(() => {
+        try {
+          const saved = localStorage.getItem('habitTaskOrder');
+          return saved ? JSON.parse(saved) : [1, 11, 3, 2, 5, 6, 7, 8];
+        } catch (e) {
+          return [1, 11, 3, 2, 5, 6, 7, 8];
+        }
+      });
+      
+      const [selectedDate, setSelectedDate] = useState(getLocalDateString());
+      const [viewMode, setViewMode] = useState('day'); // 'day', 'calendar', 'goals', 'books'
+      const [calendarMonth, setCalendarMonth] = useState(new Date());
+      const [currentStartTimes, setCurrentStartTimes] = useState({});
+      const [currentEndTimes, setCurrentEndTimes] = useState({});
+      const [currentNotes, setCurrentNotes] = useState({});
+      const [dailyNote, setDailyNote] = useState('');
+      const [currentTimeBlock, setCurrentTimeBlock] = useState(0);
+      const [timers, setTimers] = useState({});
+      const [timerStartTimes, setTimerStartTimes] = useState({});
+      const [elapsedSeconds, setElapsedSeconds] = useState({});
+      const [currentKm, setCurrentKm] = useState('');
+      const [showFinanceModal, setShowFinanceModal] = useState(false);
+      const financeTarget = 2000000; // Fixed target £2M
+      const [currentFinanceData, setCurrentFinanceData] = useState({
+        emergencyFund: '',
+        lisa: '',
+        isa: '',
+        sipp: '',
+        gia: '',
+        creditCard: '',
+        mortgage: ''
+      });
+
+      const [goals, setGoals] = useState(() => {
+        try {
+          const saved = localStorage.getItem('goals');
+          return saved ? JSON.parse(saved) : {
+            S1PN: false,
+            '£2MN': false,
+            S3HM: false,
+            '1Q84': false
+          };
+        } catch (e) {
+          return {
+            S1PN: false,
+            '£2MN': false,
+            S3HM: false,
+            '1Q84': false
+          };
+        }
+      });
+
+      const [books, setBooks] = useState(() => {
+        try {
+          const saved = localStorage.getItem('books');
+          return saved ? JSON.parse(saved) : {};
+        } catch (e) {
+          return {};
+        }
+      });
+
+      const moveTaskUp = (habitId) => {
+        const currentIndex = taskOrder.indexOf(habitId);
+        if (currentIndex > 0) {
+          const newOrder = [...taskOrder];
+          [newOrder[currentIndex - 1], newOrder[currentIndex]] = [newOrder[currentIndex], newOrder[currentIndex - 1]];
+          setTaskOrder(newOrder);
+        }
+      };
+
+      const moveTaskDown = (habitId) => {
+        const currentIndex = taskOrder.indexOf(habitId);
+        if (currentIndex < taskOrder.length - 1) {
+          const newOrder = [...taskOrder];
+          [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
+          setTaskOrder(newOrder);
+        }
+      };
+
+      const habits = [
+        { id: 1, name: '10', baseCountdown: 300, type: 'daily' },
+        { id: 11, name: '1', type: 'daily' },
+        { id: 3, name: '1000', minCountdown: 60, type: 'daily' },
+        { id: 2, name: '100', type: 'daily' },
+        { id: 5, name: 'Cultural activity', type: 'weekly' },
+        { id: 6, name: 'Give', type: 'weekly' },
+        { id: 7, name: 'HS', type: 'weekly' },
+        { id: 8, name: 'Social activity', type: 'weekly' }
+      ];
+
+      // Sort habits according to taskOrder
+      const sortedHabits = [...habits].sort((a, b) => {
+        return taskOrder.indexOf(a.id) - taskOrder.indexOf(b.id);
+      });
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('habitTrackerData288', JSON.stringify(trackedData));
+        } catch (e) {
+          console.error('Failed to save data:', e);
+        }
+      }, [trackedData]);
+
+      const getFinanceData = (date) => {
+        const dateData = getDateData(date);
+        return dateData.financeData || null;
+      };
+
+      const getPreviousDayFinanceData = (date) => {
+        const currentDate = new Date(date + 'T00:00:00');
+        let searchDate = new Date(currentDate);
+        searchDate.setDate(searchDate.getDate() - 1);
+        
+        // Look back up to 30 days for previous finance data
+        for (let i = 0; i < 30; i++) {
+          const dateStr = getLocalDateString(searchDate);
+          const financeData = getFinanceData(dateStr);
+          if (financeData) {
+            return financeData;
+          }
+          searchDate.setDate(searchDate.getDate() - 1);
+        }
+        return null;
+      };
+
+      const calculateNetValue = (financeData) => {
+        if (!financeData) return null;
+        const assets = (financeData.emergencyFund || 0) + (financeData.lisa || 0) + 
+                      (financeData.isa || 0) + (financeData.sipp || 0) + (financeData.gia || 0);
+        const liabilities = (financeData.creditCard || 0) + (financeData.mortgage || 0);
+        return assets - liabilities;
+      };
+
+      const saveFinanceData = () => {
+        const financeData = {
+          emergencyFund: parseFloat(currentFinanceData.emergencyFund) || 0,
+          lisa: parseFloat(currentFinanceData.lisa) || 0,
+          isa: parseFloat(currentFinanceData.isa) || 0,
+          sipp: parseFloat(currentFinanceData.sipp) || 0,
+          gia: parseFloat(currentFinanceData.gia) || 0,
+          creditCard: parseFloat(currentFinanceData.creditCard) || 0,
+          mortgage: parseFloat(currentFinanceData.mortgage) || 0
+        };
+        
+        setTrackedData(prev => ({
+          ...prev,
+          [selectedDate]: {
+            ...prev[selectedDate],
+            financeData: financeData
+          }
+        }));
+        
+        setShowFinanceModal(false);
+        setCurrentFinanceData({
+          emergencyFund: '',
+          lisa: '',
+          isa: '',
+          sipp: '',
+          gia: '',
+          creditCard: '',
+          mortgage: ''
+        });
+      };
+
+      const openFinanceModal = () => {
+        // First try current date, then previous day's data
+        const existing = getFinanceData(selectedDate);
+        const previousData = existing || getPreviousDayFinanceData(selectedDate);
+        
+        if (previousData) {
+          setCurrentFinanceData({
+            emergencyFund: previousData.emergencyFund.toString(),
+            lisa: previousData.lisa.toString(),
+            isa: previousData.isa.toString(),
+            sipp: previousData.sipp.toString(),
+            gia: previousData.gia.toString(),
+            creditCard: previousData.creditCard.toString(),
+            mortgage: previousData.mortgage.toString()
+          });
+        }
+        setShowFinanceModal(true);
+      };
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('habitTaskOrder', JSON.stringify(taskOrder));
+        } catch (e) {
+          console.error('Failed to save task order:', e);
+        }
+      }, [taskOrder]);
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('goals', JSON.stringify(goals));
+        } catch (e) {
+          console.error('Failed to save goals:', e);
+        }
+      }, [goals]);
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('books', JSON.stringify(books));
+        } catch (e) {
+          console.error('Failed to save books:', e);
+        }
+      }, [books]);
+
+      useEffect(() => {
+        const updateTimeBlock = () => {
+          const now = new Date();
+          const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+          const block = Math.floor(minutesSinceMidnight / 40);
+          setCurrentTimeBlock(block);
+        };
+        updateTimeBlock();
+        const interval = setInterval(updateTimeBlock, 60000);
+        return () => clearInterval(interval);
+      }, []);
+
+      useEffect(() => {
+        const interval = setInterval(() => {
+          setElapsedSeconds(prev => {
+            const updated = { ...prev };
+            Object.keys(timers).forEach(habitId => {
+              if (timers[habitId] && timerStartTimes[habitId]) {
+                updated[habitId] = Math.floor((Date.now() - timerStartTimes[habitId]) / 1000);
+              }
+            });
+            return updated;
+          });
+        }, 1000);
+        return () => clearInterval(interval);
+      }, [timers, timerStartTimes]);
+
+      const isWorkDay = (dateStr) => {
+        if (trackedData[dateStr]?.flexDayOff) return false;
+        return true;
+      };
+
+      const isNaturalWorkDay = (dateStr) => {
+        return true;
+      };
+
+      const getDateData = (date) => trackedData[date] || {};
+
+      const getSpecialDates = (dateStr) => {
+        const date = new Date(dateStr + 'T00:00:00');
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const dates = [];
+
+        const specialDays = {
+          '01-09': "🎂 Shelagh's birthday",
+          '01-17': "🎂 Jack's birthday",
+          '01-18': "🎂 Peter's birthday",
+          '02-28': "🎂 Alistair's birthday",
+          '03-26': "🎂 Sebastian's birthday",
+          '06-09': "🎂 Jin's birthday",
+          '06-10': "🎂 Theo's birthday",
+          '06-30': "🎂 Rowan's birthday",
+          '07-14': "🎂 Arthy's birthday",
+          '07-18': "🎂 Rachael's birthday",
+          '08-06': "🎂 Ed's birthday",
+          '08-27': "💕 Wedding anniversary",
+          '09-18': "🎂 Tristan's birthday",
+          '09-26': "🎂 Andrew's birthday",
+          '10-15': "🎂 Mum's birthday",
+          '10-19': "🎂 Chloe's birthday",
+          '11-03': "🎂 Dad's birthday",
+          '11-07': "🎂 Rashad's birthday",
+          '12-03': "🎂 Victoria's birthday",
+          '12-12': "🎂 Ollie's birthday"
+        };
+
+        const key = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (specialDays[key]) {
+          dates.push(specialDays[key]);
+        }
+
+        if (month === 1 && day === 1) dates.push("🏴󠁧󠁢󠁥󠁮󠁧󠁿 New Year's Day");
+        if (month === 12 && day === 25) dates.push("🏴󠁧󠁢󠁥󠁮󠁧󠁿 Christmas Day");
+        if (month === 12 && day === 26) dates.push("🏴󠁧󠁢󠁥󠁮󠁧󠁿 Boxing Day");
+
+        return dates;
+      };
+
+      const isHabitComplete = (habitId, date) => {
+        const dateData = getDateData(date);
+        return dateData[`task${habitId}Complete`] || false;
+      };
+
+      const isDayComplete = (date) => {
+        if (!isWorkDay(date)) return true;
+        const dateData = getDateData(date);
+        
+        let requiredTasks = [1, 2, 3, 11];
+        
+        const allHabitsComplete = requiredTasks.every(id => isHabitComplete(id, date));
+        const totalTime = [1, 2, 3, 11].reduce((sum, id) => sum + (dateData[`time${id}`] || 0), 0);
+        return allHabitsComplete && totalTime >= 300;
+      };
+
+      const getTotalTime = (date) => {
+        const dateData = getDateData(date);
+        return [1, 2, 3, 11].reduce((sum, id) => sum + (dateData[`time${id}`] || 0), 0);
+      };
+
+      const getOvertimeBank = () => {
+        let totalOvertime = 0;
+        Object.keys(trackedData).forEach(date => {
+          if (isWorkDay(date)) {
+            const totalTime = getTotalTime(date);
+            if (totalTime > 288) {
+              totalOvertime += (totalTime - 288);
+            }
+          }
+        });
+        return totalOvertime;
+      };
+
+      const getFlexDaysRemaining = () => {
+        const earned = Math.floor(getOvertimeBank() / 288);
+        const used = Object.keys(trackedData).filter(d => trackedData[d]?.flexDayOff).length;
+        return earned - used;
+      };
+
+      const getOvertimeProgress = () => {
+        return getOvertimeBank() % 288;
+      };
+
+      const toggleFlexDayOff = () => {
+        const isCurrentlyFlex = trackedData[selectedDate]?.flexDayOff;
+        setTrackedData(prev => ({
+          ...prev,
+          [selectedDate]: {
+            ...prev[selectedDate],
+            flexDayOff: !isCurrentlyFlex
+          }
+        }));
+      };
+
+      const updateHabit = (habitId) => {
+        setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], [`task${habitId}Complete`]: true}}));
+      };
+
+      const deleteTask = (habitId) => {
+        setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], [`task${habitId}Complete`]: false}}));
+      };
+
+      const calculateMinutes = (startTime, endTime) => {
+        if (!startTime || !endTime) return 0;
+        const [startHour, startMin] = startTime.split(':').map(Number);
+        const [endHour, endMin] = endTime.split(':').map(Number);
+        const startMinutes = startHour * 60 + startMin;
+        let endMinutes = endHour * 60 + endMin;
+        if (endMinutes < startMinutes) endMinutes += 24 * 60;
+        return endMinutes - startMinutes;
+      };
+
+      const updateTime = (habitId) => {
+        const startTime = currentStartTimes[habitId];
+        const endTime = currentEndTimes[habitId];
+        if (startTime && endTime) {
+          const minutes = calculateMinutes(startTime, endTime);
+          if (minutes > 0) {
+            const currentTotal = getDateData(selectedDate)[`time${habitId}`] || 0;
+            setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], [`time${habitId}`]: currentTotal + minutes, [`timeEntries${habitId}`]: [...(prev[selectedDate]?.[`timeEntries${habitId}`] || []), { start: startTime, end: endTime, minutes }]}}));
+            setCurrentStartTimes(prev => ({ ...prev, [habitId]: '' }));
+            setCurrentEndTimes(prev => ({ ...prev, [habitId]: '' }));
+          }
+        }
+      };
+
+      const deleteTimeEntry = (habitId, entryIndex) => {
+        const dateData = getDateData(selectedDate);
+        const timeEntries = dateData[`timeEntries${habitId}`] || [];
+        const entryToDelete = timeEntries[entryIndex];
+        if (entryToDelete) {
+          const newEntries = timeEntries.filter((_, index) => index !== entryIndex);
+          const currentTotal = dateData[`time${habitId}`] || 0;
+          const newTotal = Math.max(0, currentTotal - entryToDelete.minutes);
+          setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], [`time${habitId}`]: newTotal, [`timeEntries${habitId}`]: newEntries}}));
+        }
+      };
+
+      const startTimer = (habitId) => {
+        setTimers(prev => ({ ...prev, [habitId]: true }));
+        setTimerStartTimes(prev => ({ ...prev, [habitId]: Date.now() }));
+        setElapsedSeconds(prev => ({ ...prev, [habitId]: 0 }));
+      };
+
+      const pauseTimer = (habitId) => {
+        setTimers(prev => ({ ...prev, [habitId]: false }));
+      };
+
+      const stopTimer = (habitId) => {
+        const elapsed = elapsedSeconds[habitId] || 0;
+        
+        if (elapsed > 0) {
+          const minutes = Math.floor(elapsed / 60);
+          const currentTotal = getDateData(selectedDate)[`time${habitId}`] || 0;
+          const now = new Date();
+          const endTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          const startDate = new Date(timerStartTimes[habitId]);
+          const startTime = `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`;
+          setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], [`time${habitId}`]: currentTotal + minutes, [`timeEntries${habitId}`]: [...(prev[selectedDate]?.[`timeEntries${habitId}`] || []), { start: startTime, end: endTime, minutes }]}}));
+        }
+        
+        setTimers(prev => ({ ...prev, [habitId]: false }));
+        setTimerStartTimes(prev => ({ ...prev, [habitId]: null }));
+        setElapsedSeconds(prev => ({ ...prev, [habitId]: 0 }));
+      };
+
+      const getCountdownMinutes = (habitId) => {
+        const dateData = getDateData(selectedDate);
+        
+        if (habitId === 3) {
+          // Special logic for task 3 (1000) with minimum 60 minutes
+          const timeOnOtherTasks = [1, 2, 11].reduce((sum, id) => sum + (dateData[`time${id}`] || 0), 0);
+          const timeOnTask3 = dateData.time3 || 0;
+          const baseCountdown = Math.max(60, 300 - timeOnOtherTasks);
+          const remaining = baseCountdown - timeOnTask3;
+          
+          if (remaining <= 0) {
+            return null;
+          }
+          
+          return remaining;
+        } else {
+          // Normal logic for other tasks
+          const totalLoggedMinutes = [1, 2, 3, 11].reduce((sum, id) => sum + (dateData[`time${id}`] || 0), 0);
+          const remaining = 300 - totalLoggedMinutes;
+          
+          if (remaining <= 0) {
+            return null;
+          }
+          
+          return remaining;
+        }
+      };
+
+      const formatTime = (seconds, habitId) => {
+        const dateData = getDateData(selectedDate);
+        
+        let displaySeconds = seconds;
+        
+        if (habitId === 3) {
+          // Special logic for task 3 (1000) with minimum 60 minutes
+          const timeOnOtherTasks = [1, 2, 11].reduce((sum, id) => sum + (dateData[`time${id}`] || 0), 0);
+          const timeOnTask3 = dateData.time3 || 0;
+          const baseCountdown = Math.max(60, 300 - timeOnOtherTasks);
+          const remainingMinutes = baseCountdown - timeOnTask3;
+          const remainingSeconds = remainingMinutes * 60;
+          displaySeconds = Math.max(0, remainingSeconds - seconds);
+        } else {
+          // Normal logic for other tasks
+          const totalLoggedMinutes = [1, 2, 3, 11].reduce((sum, id) => sum + (dateData[`time${id}`] || 0), 0);
+          const totalLoggedSeconds = totalLoggedMinutes * 60;
+          const targetSeconds = 300 * 60;
+          const totalElapsedSeconds = seconds + totalLoggedSeconds;
+          const remaining = targetSeconds - totalElapsedSeconds;
+          
+          if (remaining > 0) {
+            displaySeconds = remaining;
+          } else {
+            // Count up mode (over 300 minutes)
+            displaySeconds = seconds;
+          }
+        }
+        
+        const totalMinutes = Math.floor(displaySeconds / 60);
+        return `${totalMinutes}m`;
+      };
+
+      const updateNote = (habitId) => {
+        const note = currentNotes[habitId] || '';
+        setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], [`note${habitId}`]: note}}));
+        setCurrentNotes(prev => ({ ...prev, [habitId]: '' }));
+      };
+
+      const editNote = (habitId) => {
+        const existingNote = getDateData(selectedDate)[`note${habitId}`] || '';
+        setCurrentNotes(prev => ({ ...prev, [habitId]: existingNote }));
+      };
+
+      const deleteNote = (habitId) => {
+        setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], [`note${habitId}`]: ''}}));
+        setCurrentNotes(prev => ({ ...prev, [habitId]: '' }));
+      };
+
+      const addKm = () => {
+        const km = parseFloat(currentKm);
+        if (km && km > 0) {
+          const currentTotal = getDateData(selectedDate).km1 || 0;
+          setTrackedData(prev => ({
+            ...prev, 
+            [selectedDate]: {
+              ...prev[selectedDate], 
+              km1: currentTotal + km,
+              kmEntries1: [...(prev[selectedDate]?.kmEntries1 || []), { km: km }]
+            }
+          }));
+          setCurrentKm('');
+        }
+      };
+
+      const deleteKmEntry = (entryIndex) => {
+        const dateData = getDateData(selectedDate);
+        const kmEntries = dateData.kmEntries1 || [];
+        const entryToDelete = kmEntries[entryIndex];
+        if (entryToDelete) {
+          const newEntries = kmEntries.filter((_, index) => index !== entryIndex);
+          const currentTotal = dateData.km1 || 0;
+          const newTotal = Math.max(0, currentTotal - entryToDelete.km);
+          setTrackedData(prev => ({
+            ...prev, 
+            [selectedDate]: {
+              ...prev[selectedDate], 
+              km1: newTotal, 
+              kmEntries1: newEntries
+            }
+          }));
+        }
+      };
+
+      const updateDailyNote = () => {
+        const userNote = dailyNote.trim();
+        setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], dailyNote: userNote}}));
+        setDailyNote('');
+      };
+
+      const editDailyNote = () => {
+        const existingNote = getDateData(selectedDate).dailyNote || '';
+        setDailyNote(existingNote);
+      };
+
+      const deleteDailyNote = () => {
+        setTrackedData(prev => ({...prev, [selectedDate]: {...prev[selectedDate], dailyNote: ''}}));
+        setDailyNote('');
+      };
+
+      const exportToExcel = () => {
+        const dates = Object.keys(trackedData).sort();
+        let csvContent = "Date,Work Day,Flex Day,Net Worth,Emergency Fund,LISA,ISA,SIPP,GIA,Credit Card,Mortgage,Distance from Target,Task 1,Task 1 Time,Task 1 Note,Task 11,Task 11 Time,Task 11 Note,Task 3,Task 3 Time,Task 3 Note,Task 2,Task 2 Time,Task 2 Note,Cultural activity,Cultural activity Note,Give,Give Note,HS,HS Note,Social activity,Social activity Note,Total Time,Overtime,Daily Note,All Complete\n";
+        dates.forEach(date => {
+          const data = trackedData[date];
+          const workDay = isWorkDay(date);
+          const targetTime = workDay ? 300 : 0;
+          const totalTime = (data.time1 || 0) + (data.time2 || 0) + (data.time3 || 0) + (data.time11 || 0);
+          const overtime = workDay && totalTime > 288 ? totalTime - 288 : 0;
+          
+          const financeData = data.financeData;
+          const netWorth = financeData ? calculateNetValue(financeData) : '';
+          const distanceFromTarget = financeData && financeTarget ? netWorth - financeTarget : '';
+          
+          const row = [
+            date,
+            workDay ? 'Yes' : 'No',
+            data.flexDayOff ? 'Yes' : 'No',
+            netWorth,
+            financeData ? financeData.emergencyFund : '',
+            financeData ? financeData.lisa : '',
+            financeData ? financeData.isa : '',
+            financeData ? financeData.sipp : '',
+            financeData ? financeData.gia : '',
+            financeData ? financeData.creditCard : '',
+            financeData ? financeData.mortgage : '',
+            distanceFromTarget,
+            data.task1Complete ? 'Yes' : 'No',
+            data.time1 || 0,
+            `"${(data.note1 || '').replace(/"/g, '""')}"`,
+            data.task11Complete ? 'Yes' : 'No',
+            data.time11 || 0,
+            `"${(data.note11 || '').replace(/"/g, '""')}"`,
+            data.task3Complete ? 'Yes' : 'No',
+            data.time3 || 0,
+            `"${(data.note3 || '').replace(/"/g, '""')}"`,
+            data.task2Complete ? 'Yes' : 'No',
+            data.time2 || 0,
+            `"${(data.note2 || '').replace(/"/g, '""')}"`,
+            data.task5Complete ? 'Yes' : 'No',
+            `"${(data.note5 || '').replace(/"/g, '""')}"`,
+            data.task6Complete ? 'Yes' : 'No',
+            `"${(data.note6 || '').replace(/"/g, '""')}"`,
+            data.task7Complete ? 'Yes' : 'No',
+            `"${(data.note7 || '').replace(/"/g, '""')}"`,
+            data.task8Complete ? 'Yes' : 'No',
+            `"${(data.note8 || '').replace(/"/g, '""')}"`,
+            totalTime,
+            overtime,
+            `"${(data.dailyNote || '').replace(/"/g, '""')}"`,
+            isDayComplete(date) ? 'Yes' : 'No'
+          ];
+          csvContent += row.join(',') + '\n';
+        });
+
+        csvContent += `\nFlex Days Remaining,${getFlexDaysRemaining()}\n`;
+        csvContent += `Overtime Bank,${getOvertimeBank()} minutes\n`;
+        csvContent += `Finance Target,${financeTarget}\n`;
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `habit_tracker_300_${getLocalDateString()}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      const getStreak = () => {
+        let streak = 0;
+        let checkDate = new Date();
+        while (streak < 365) {
+          const dateStr = checkDate.toISOString().split('T')[0];
+          if (!isDayComplete(dateStr)) break;
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+        return streak;
+      };
+
+      const changeDate = (days) => {
+        const date = new Date(selectedDate + 'T00:00:00');
+        date.setDate(date.getDate() + days);
+        setSelectedDate(getLocalDateString(date));
+      };
+
+      const goToToday = () => setSelectedDate(getLocalDateString());
+
+      const isUKPublicHoliday = (dateStr) => {
+        const date = new Date(dateStr + 'T00:00:00');
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const year = date.getFullYear();
+        
+        const fixedHolidays = [
+          { month: 1, day: 1 },
+          { month: 12, day: 25 },
+          { month: 12, day: 26 }
+        ];
+        
+        for (const holiday of fixedHolidays) {
+          if (month === holiday.month && day === holiday.day) return true;
+        }
+        
+        if (year === 2025) {
+          const holidays2025 = [
+            '2025-04-18',
+            '2025-04-21',
+            '2025-05-05',
+            '2025-05-26',
+            '2025-08-25'
+          ];
+          if (holidays2025.includes(dateStr)) return true;
+        }
+        
+        if (year === 2026) {
+          const holidays2026 = [
+            '2026-04-03',
+            '2026-04-06',
+            '2026-05-04',
+            '2026-05-25',
+            '2026-08-31'
+          ];
+          if (holidays2026.includes(dateStr)) return true;
+        }
+        
+        return false;
+      };
+
+      const generateCalendarDays = () => {
+        const days = [];
+        const today = getLocalDateString();
+        const selected = new Date(selectedDate + 'T00:00:00');
+        
+        let currentDate = new Date(selected);
+        currentDate.setDate(currentDate.getDate() - 7);
+        
+        for (let i = 0; i < 16; i++) {
+          const dateStr = getLocalDateString(currentDate);
+          
+          const dayOfWeek = currentDate.getDay();
+          const isSunday = dayOfWeek === 0;
+          const isSaturday = dayOfWeek === 6;
+          const isPublicHoliday = isUKPublicHoliday(dateStr);
+          const isWeekendOrHoliday = isSaturday || isSunday || isPublicHoliday;
+          const specialDates = getSpecialDates(dateStr);
+          const hasSpecialDate = specialDates.length > 0 || isPublicHoliday;
+          
+          days.push({
+            date: dateStr,
+            isComplete: isDayComplete(dateStr),
+            isSelected: dateStr === selectedDate,
+            isToday: dateStr === today,
+            display: currentDate.getDate(),
+            isWeekendOrHoliday: isWeekendOrHoliday,
+            hasSpecialDate: hasSpecialDate
+          });
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return days;
+      };
+
+      const getTaskCompletionOrder = (date) => {
+        const dateData = getDateData(date);
+        const taskTimes = [];
+        
+        [1, 2, 3, 11, 5, 6, 7, 8].forEach(id => {
+          const timeEntries = dateData[`timeEntries${id}`] || [];
+          const isComplete = dateData[`task${id}Complete`] || false;
+          let lastTime = null;
+          let sortPriority = 2;
+          
+          if (timeEntries.length > 0) {
+            const lastEntry = timeEntries[timeEntries.length - 1];
+            lastTime = lastEntry.end;
+            sortPriority = 0;
+          } else if (isComplete) {
+            lastTime = '99:99';
+            sortPriority = 1;
+          }
+          
+          taskTimes.push({ id, lastTime, sortPriority });
+        });
+        
+        taskTimes.sort((a, b) => {
+          if (a.sortPriority !== b.sortPriority) {
+            return a.sortPriority - b.sortPriority;
+          }
+          if (a.lastTime === null && b.lastTime === null) return 0;
+          if (a.lastTime === null) return 1;
+          if (b.lastTime === null) return -1;
+          return a.lastTime.localeCompare(b.lastTime);
+        });
+        
+        return taskTimes.map(t => t.id);
+      };
+
+      const generateMonthCalendar = () => {
+        const year = calendarMonth.getFullYear();
+        const month = calendarMonth.getMonth();
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        const startDay = firstDay.getDay();
+        const daysInMonth = lastDay.getDate();
+        
+        const weeks = [];
+        let currentWeek = [];
+        
+        for (let i = 0; i < startDay; i++) {
+          const prevMonthDay = new Date(year, month, -startDay + i + 1);
+          currentWeek.push({
+            date: getLocalDateString(prevMonthDay),
+            day: prevMonthDay.getDate(),
+            isCurrentMonth: false
+          });
+        }
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = new Date(year, month, day);
+          const dateStr = getLocalDateString(date);
+          
+          currentWeek.push({
+            date: dateStr,
+            day: day,
+            isCurrentMonth: true,
+            isToday: dateStr === getLocalDateString(),
+            isComplete: isDayComplete(dateStr),
+            totalTime: getTotalTime(dateStr),
+            isWorkDay: isWorkDay(dateStr),
+            isFlexDay: trackedData[dateStr]?.flexDayOff || false,
+            specialDates: getSpecialDates(dateStr),
+            isWeekend: date.getDay() === 0 || date.getDay() === 6,
+            isHoliday: isUKPublicHoliday(dateStr),
+            hasSpecialDate: getSpecialDates(dateStr).length > 0 || isUKPublicHoliday(dateStr)
+          });
+          
+          if (currentWeek.length === 7) {
+            weeks.push(currentWeek);
+            currentWeek = [];
+          }
+        }
+        
+        while (currentWeek.length > 0 && currentWeek.length < 7) {
+          const nextMonthDay = new Date(year, month + 1, currentWeek.length - (daysInMonth - lastDay.getDay() + startDay));
+          currentWeek.push({
+            date: getLocalDateString(nextMonthDay),
+            day: nextMonthDay.getDate(),
+            isCurrentMonth: false
+          });
+        }
+        
+        if (currentWeek.length > 0) {
+          weeks.push(currentWeek);
+        }
+        
+        return weeks;
+      };
+
+      const changeCalendarMonth = (months) => {
+        const newDate = new Date(calendarMonth);
+        newDate.setMonth(newDate.getMonth() + months);
+        setCalendarMonth(newDate);
+      };
+
+      const goToCurrentMonth = () => {
+        setCalendarMonth(new Date());
+      };
+
+      const completedToday = habits.filter(h => isHabitComplete(h.id, selectedDate)).length;
+      const totalTime = getTotalTime(selectedDate);
+      const targetTime = isWorkDay(selectedDate) ? 300 : 0;
+      const timeComplete = totalTime >= targetTime;
+      const calendarDays = generateCalendarDays();
+      const isToday = selectedDate === getLocalDateString();
+      const selectedDateObj = new Date(selectedDate + 'T00:00:00');
+      const todayDateObj = new Date(getLocalDateString() + 'T00:00:00');
+      const isPastDate = selectedDateObj < todayDateObj;
+      const isFutureDate = selectedDateObj > todayDateObj;
+      
+      let displayHabits;
+      if (isToday) {
+        displayHabits = sortedHabits;
+      } else if (isPastDate) {
+        const completionOrder = getTaskCompletionOrder(selectedDate);
+        displayHabits = [...habits].sort((a, b) => {
+          return completionOrder.indexOf(a.id) - completionOrder.indexOf(b.id);
+        });
+      } else {
+        displayHabits = habits;
+      }
+      
+      const dailyHabits = displayHabits.filter(h => h.type === 'daily');
+      const weeklyHabits = displayHabits.filter(h => h.type === 'weekly');
+      
+      const allDailyComplete = dailyHabits.every(h => isHabitComplete(h.id, selectedDate));
+      
+      let visibleHabits;
+      if (isToday) {
+        const incompleteDailyHabits = dailyHabits.filter(h => !isHabitComplete(h.id, selectedDate));
+        if (incompleteDailyHabits.length > 0) {
+          visibleHabits = incompleteDailyHabits;
+        } else {
+          const incompleteWeeklyHabits = weeklyHabits.filter(h => !isHabitComplete(h.id, selectedDate));
+          visibleHabits = incompleteWeeklyHabits;
+        }
+      } else {
+        visibleHabits = [...dailyHabits, ...weeklyHabits];
+      }
+      
+      const isWorkDaySelected = isWorkDay(selectedDate);
+
+      const booksList = [
+        { title: "A Streetcar Named Desire", author: "Tennessee Williams" },
+        { title: "A Tale of Two Cities", author: "Charles Dickens" },
+        { title: "All Quiet on the Western Front", author: "Erich Maria Remarque" },
+        { title: "An American Tragedy", author: "Theodore Dreiser" },
+        { title: "Animal Farm", author: "George Orwell" },
+        { title: "Anna Karenina", author: "Leo Tolstoy" },
+        { title: "Beloved", author: "Toni Morrison" },
+        { title: "Brave New World", author: "Aldous Huxley" },
+        { title: "Candide", author: "Voltaire" },
+        { title: "Catch-22", author: "Joseph Heller" },
+        { title: "Clarissa", author: "Samuel Richardson" },
+        { title: "Cousin Bette", author: "Honoré de Balzac" },
+        { title: "Crime and Punishment", author: "Fyodor Dostoevsky" },
+        { title: "David Copperfield", author: "Charles Dickens" },
+        { title: "Dead souls", author: "Nikolai Gogol" },
+        { title: "Democratic vistas", author: "Walt Whitman" },
+        { title: "Doctor Zhivago", author: "Boris Pasternak" },
+        { title: "Don Quixote", author: "Miguel de Cervantes" },
+        { title: "Dracula", author: "Bram Stoker" },
+        { title: "Dream tigers", author: "Jorge Luis Borges" },
+        { title: "Emma", author: "Jane Austen" },
+        { title: "Eugenie Grandet", author: "Honoré de Balzac" },
+        { title: "Fathers and sons", author: "Ivan Turgenev" },
+        { title: "Finnegans Wake", author: "James Joyce" },
+        { title: "For Whom the Bell Tolls", author: "Ernest Hemingway" },
+        { title: "Frankenstein", author: "Mary Shelley" },
+        { title: "Gargantua and pantagruel", author: "François Rabelais" },
+        { title: "Go tell it on the mountain", author: "James Baldwin" },
+        { title: "Great Expectations", author: "Charles Dickens" },
+        { title: "Gulliver's Travels", author: "Jonathan Swift" },
+        { title: "Hamlet", author: "William Shakespeare" },
+        { title: "Hard times", author: "Charles Dickens" },
+        { title: "Haroun and the sea of stories", author: "Salman Rushdie" },
+        { title: "Heart of Darkness", author: "Joseph Conrad" },
+        { title: "Herzog", author: "Saul Bellow" },
+        { title: "His dark materials", author: "Philip Pullman" },
+        { title: "Housekeeping", author: "Marilynne Robinson" },
+        { title: "Huckleberry Finn", author: "Mark Twain" },
+        { title: "Humboldt's gift", author: "Saul Bellow" },
+        { title: "I, Claudius", author: "Robert Graves" },
+        { title: "If on a winter's night", author: "Italo Calvino" },
+        { title: "Invisible Man", author: "Ralph Ellison" },
+        { title: "Jane Eyre", author: "Charlotte Brontë" },
+        { title: "Journey to the west", author: "Wu Ch'eng-en" },
+        { title: "Jude the Obscure", author: "Thomas Hardy" },
+        { title: "King Lear", author: "William Shakespeare" },
+        { title: "Kokoro", author: "Natsume Soseki" },
+        { title: "Krapp's last tape", author: "Samuel Beckett" },
+        { title: "Kubla Khan", author: "Samuel Taylor Coleridge" },
+        { title: "Labyrinths", author: "Jorge Luis Borges" },
+        { title: "Lady Chatterley's Lover", author: "D.H. Lawrence" },
+        { title: "Leaves of grass", author: "Walt Whitman" },
+        { title: "Les Misérables", author: "Victor Hugo" },
+        { title: "Light in August", author: "William Faulkner" },
+        { title: "Little Dorrit", author: "Charles Dickens" },
+        { title: "Little women", author: "Louisa May Alcott" },
+        { title: "Lolita", author: "Vladimir Nabokov" },
+        { title: "Long day's journey into night", author: "Eugene O'Neill" },
+        { title: "Lord of the Flies", author: "William Golding" },
+        { title: "Lucky Jim", author: "Kingsley Amis" },
+        { title: "Lycidas", author: "John Milton" },
+        { title: "Madame Bovary", author: "Gustave Flaubert" },
+        { title: "Middlemarch", author: "George Eliot" },
+        { title: "Midnight's children", author: "Salman Rushdie" },
+        { title: "Moby Dick", author: "Herman Melville" },
+        { title: "Money", author: "Martin Amis" },
+        { title: "Mourning becomes Electra", author: "Eugene O'Neill" },
+        { title: "Mrs. Dalloway", author: "Virginia Woolf" },
+        { title: "Native Son", author: "Richard Wright" },
+        { title: "Nineteen Eighty-Four", author: "George Orwell" },
+        { title: "Nostromo", author: "Joseph Conrad" },
+        { title: "Of human bondage", author: "W. Somerset Maugham" },
+        { title: "Of Mice and Men", author: "John Steinbeck" },
+        { title: "On the morning of Christ's nativity", author: "John Milton" },
+        { title: "On the Road", author: "Jack Kerouac" },
+        { title: "One Flew Over the Cuckoo's Nest", author: "Ken Kesey" },
+        { title: "One Hundred Years of Solitude", author: "Gabriel García Márquez" },
+        { title: "Orlando", author: "Virginia Woolf" },
+        { title: "Oscar and Lucinda", author: "Peter Carey" },
+        { title: "Othello", author: "William Shakespeare" },
+        { title: "Our mutual friend", author: "Charles Dickens" },
+        { title: "Pale fire", author: "Vladimir Nabokov" },
+        { title: "Paradise Lost", author: "John Milton" },
+        { title: "Pilgrim's progress", author: "John Bunyan" },
+        { title: "Portnoy's complaint", author: "Vladimir Nabokov" },
+        { title: "Pride and Prejudice", author: "Jane Austen" },
+        { title: "Robinson Crusoe", author: "Daniel Defoe" },
+        { title: "Romeo and Juliet", author: "William Shakespeare" },
+        { title: "Sakuntala", author: "Kalidasa" },
+        { title: "Scoop", author: "Evelyn Waugh" },
+        { title: "Sense and Sensibility", author: "Jane Austen" },
+        { title: "Shah nameh", author: "Firdausi" },
+        { title: "Slaughterhouse-Five", author: "Kurt Vonnegut" },
+        { title: "Sons and Lovers", author: "D.H. Lawrence" },
+        { title: "Speak, memory", author: "Vladimir Nabokov" },
+        { title: "Tender Is the Night", author: "F. Scott Fitzgerald" },
+        { title: "Tess of the d'Urbervilles", author: "Thomas Hardy" },
+        { title: "The Adventures of Augie March", author: "Saul Bellow" },
+        { title: "The Adventures of Huckleberry Finn", author: "Mark Twain" },
+        { title: "The Adventures of Tom Sawyer", author: "Mark Twain" },
+        { title: "The Aeneid", author: "Virgil" },
+        { title: "The Age of Innocence", author: "Edith Wharton" },
+        { title: "The ancient mariner", author: "Samuel Taylor Coleridge" },
+        { title: "The bhagavad gita", author: "Anonymous" },
+        { title: "The brief wondrous life of Oscar Wao", author: "Junot Díaz" },
+        { title: "The Brothers Karamazov", author: "Fyodor Dostoevsky" },
+        { title: "The Call of the Wild", author: "Jack London" },
+        { title: "The Canterbury Tales", author: "Geoffrey Chaucer" },
+        { title: "The castle", author: "Franz Kafka" },
+        { title: "The Catcher in the Rye", author: "J.D. Salinger" },
+        { title: "The cloud messenger", author: "Kalidasa" },
+        { title: "The Count of Monte Cristo", author: "Alexandre Dumas" },
+        { title: "The custom of the country", author: "Edith Wharton" },
+        { title: "The divine comedy", author: "Dante Alighieri" },
+        { title: "The dream of the red chamber", author: "Cao Xueqin" },
+        { title: "The Eustace diamonds", author: "Anthony Trollope" },
+        { title: "The first circle", author: "Aleksandr Solzhenitsyn" },
+        { title: "The Good Earth", author: "Pearl S. Buck" },
+        { title: "The good soldier", author: "Ford Madox Ford" },
+        { title: "The Grapes of Wrath", author: "John Steinbeck" },
+        { title: "The Great Gatsby", author: "F. Scott Fitzgerald" },
+        { title: "The handmaid's tale", author: "Margaret Atwood" },
+        { title: "The heart is a lonely hunter", author: "Carson McCullers" },
+        { title: "The hitchiker's guide to the galaxy", author: "Douglas Adams" },
+        { title: "The house of mirth", author: "Edith Wharton" },
+        { title: "The Hunchback of Notre-Dame", author: "Victor Hugo" },
+        { title: "The iceman cometh", author: "Eugene O'Neill" },
+        { title: "The Iliad", author: "Homer" },
+        { title: "The Jungle", author: "Upton Sinclair" },
+        { title: "The last chronicle of Barset", author: "Anthony Trollope" },
+        { title: "The Lord of the Rings", author: "J.R.R. Tolkien" },
+        { title: "The Magic Mountain", author: "Thomas Mann" },
+        { title: "The mahabharata", author: "Vyasa" },
+        { title: "The Makioka sisters", author: "Jun'ichirō Tanizaki" },
+        { title: "The mayor of Casterbridge", author: "Thomas Hardy" },
+        { title: "The meaning of truth", author: "William James" },
+        { title: "The Metamorphosis", author: "Franz Kafka" },
+        { title: "The narrow road to the deep north", author: "Matsuo Bashō" },
+        { title: "The Odyssey", author: "Homer" },
+        { title: "The old curiousity shop", author: "Charles Dickens" },
+        { title: "The phantom toll booth", author: "Norton Juster" },
+        { title: "The Picture of Dorian Gray", author: "Oscar Wilde" },
+        { title: "The pillow book", author: "Sei Shōnagon" },
+        { title: "The platform sutra of the sixth patriarch", author: "Hui-neng" },
+        { title: "The plum in the golden vase", author: "Anonymous" },
+        { title: "The portrait of a lady", author: "Henry James" },
+        { title: "The prelude", author: "William Wordsworth" },
+        { title: "The prime of Miss Jean Brodie", author: "Muriel Spark" },
+        { title: "The rainbow", author: "D.H. Lawrence" },
+        { title: "The Red and the Black", author: "Stendhal" },
+        { title: "The romance of three kingdoms", author: "Luo Guanzhong" },
+        { title: "The Scarlet Letter", author: "Nathaniel Hawthorne" },
+        { title: "The Song of Solomon", author: "Toni Morrison" },
+        { title: "The Sound and the Fury", author: "William Faulkner" },
+        { title: "The Strange Case of Dr. Jekyll and Mr. Hyde", author: "Robert Louis Stevenson" },
+        { title: "The Sun Also Rises", author: "Ernest Hemingway" },
+        { title: "The tale of genji", author: "Murasaki Shikibu" },
+        { title: "The Tempest", author: "William Shakespeare" },
+        { title: "The thousand and one nights", author: "Anonymous" },
+        { title: "The Three Musketeers", author: "Alexandre Dumas" },
+        { title: "The Time Machine", author: "H.G. Wells" },
+        { title: "The tin drum", author: "Günter Grass" },
+        { title: "The Trial", author: "Franz Kafka" },
+        { title: "The Turn of the Screw", author: "Henry James" },
+        { title: "The warden", author: "Anthony Trollope" },
+        { title: "The Waste Land", author: "T.S. Eliot" },
+        { title: "The waves", author: "Virginia Woolf" },
+        { title: "The Way of All Flesh", author: "Samuel Butler" },
+        { title: "The way we live now", author: "Anthony Trollope" },
+        { title: "The wind in the willows", author: "Kenneth Grahame" },
+        { title: "Their eyes were watching god", author: "Zora Neale Hurston" },
+        { title: "Things Fall Apart", author: "Chinua Achebe" },
+        { title: "Three sisters", author: "Anton Chekhov" },
+        { title: "Tinker, tailor, soldier", author: "John le Carré" },
+        { title: "To Kill a Mockingbird", author: "Harper Lee" },
+        { title: "To the Lighthouse", author: "Virginia Woolf" },
+        { title: "Tom Jones", author: "Henry Fielding" },
+        { title: "Treasure Island", author: "Robert Louis Stevenson" },
+        { title: "Tristram Shandy", author: "Laurence Sterne" },
+        { title: "Tropic of Cancer", author: "Henry Miller" },
+        { title: "Ulysses", author: "James Joyce" },
+        { title: "Uncle Vanya", author: "Anton Chekhov" },
+        { title: "Under the net", author: "Iris Murdoch" },
+        { title: "Vanity Fair", author: "William Makepeace Thackeray" },
+        { title: "War and Peace", author: "Leo Tolstoy" },
+        { title: "White noise", author: "Don DeLillo" },
+        { title: "Wide Sargasso Sea", author: "Jean Rhys" },
+        { title: "Women in love", author: "D.H. Lawrence" },
+        { title: "Wuthering Heights", author: "Emily Brontë" },
+        { title: "Il nome della rosa", author: "Umberto Eco" },
+        { title: "Il Gattopardo", author: "Giuseppe Tomasi di Lampedusa" },
+        { title: "Du côté de chez Swann", author: "Marcel Proust" },
+        { title: "À l'ombre des jeunes filles en fleurs", author: "Marcel Proust" },
+        { title: "Le Côté de Guermantes", author: "Marcel Proust" },
+        { title: "Sodome et Gomorrhe", author: "Marcel Proust" },
+        { title: "La Prisonnière", author: "Marcel Proust" },
+        { title: "Albertine disparue", author: "Marcel Proust" },
+        { title: "Le Temps retrouvé", author: "Marcel Proust" },
+        { title: "風の歌を聴け", author: "Haruki Murakami" },
+        { title: "1973年のピンボール", author: "Haruki Murakami" },
+        { title: "羊をめぐる冒険", author: "Haruki Murakami" },
+        { title: "中国行きのスロウ・ボート", author: "Haruki Murakami" },
+        { title: "螢・納屋を焼く・その他の短編", author: "Haruki Murakami" },
+        { title: "回転木馬のデッド・ヒート", author: "Haruki Murakami" },
+        { title: "世界の終りとハードボイルド・ワンダーランド", author: "Haruki Murakami" },
+        { title: "パン屋再襲撃", author: "Haruki Murakami" },
+        { title: "ノルウェイの森", author: "Haruki Murakami" },
+        { title: "ダンス・ダンス・ダンス", author: "Haruki Murakami" },
+        { title: "TVピープル", author: "Haruki Murakami" },
+        { title: "国境の南、太陽の西", author: "Haruki Murakami" },
+        { title: "ねじまき鳥クロニクル", author: "Haruki Murakami" },
+        { title: "アンダーグラウンド", author: "Haruki Murakami" },
+        { title: "スプートニクの恋人", author: "Haruki Murakami" },
+        { title: "神の子どもたちはみな踊る", author: "Haruki Murakami" },
+        { title: "海辺のカフカ", author: "Haruki Murakami" },
+        { title: "アフターダーク", author: "Haruki Murakami" },
+        { title: "東京奇譚集", author: "Haruki Murakami" },
+        { title: "めくらやなぎと眠る女", author: "Haruki Murakami" },
+        { title: "走ることについて語るときに僕の語ること", author: "Haruki Murakami" },
+        { title: "1Q84", author: "Haruki Murakami" }
+      ];
+
+      if (viewMode === 'goals') {
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-2">
+            <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-xl font-bold text-gray-800">Goals</h1>
+                <button onClick={() => setViewMode('day')} className="p-2 bg-[rgb(30,73,160)] text-white rounded">
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {Object.keys(goals).map(goalKey => (
+                  <div key={goalKey} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <button
+                      onClick={() => setGoals(prev => ({...prev, [goalKey]: !prev[goalKey]}))}
+                      className="flex-shrink-0"
+                    >
+                      {goals[goalKey] ? (
+                        <CheckCircle className="w-8 h-8 text-[rgb(23,115,81)]" />
+                      ) : (
+                        <Circle className="w-8 h-8 text-gray-300" />
+                      )}
+                    </button>
+                    <span className={`text-lg font-semibold ${goals[goalKey] ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                      {goalKey}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (viewMode === 'books') {
+        const completedCount = booksList.filter(book => books[book.title]).length;
+        
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-2">
+            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h1 className="text-xl font-bold text-gray-800">LTR</h1>
+                  <p className="text-sm text-gray-600">{completedCount} / {booksList.length} completed</p>
+                </div>
+                <button onClick={() => setViewMode('day')} className="p-2 bg-[rgb(30,73,160)] text-white rounded">
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {booksList.map(book => (
+                  <div key={book.title} className="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
+                    <button
+                      onClick={() => setBooks(prev => ({...prev, [book.title]: !prev[book.title]}))}
+                      className="flex-shrink-0 mt-0.5"
+                    >
+                      {books[book.title] ? (
+                        <CheckCircle className="w-5 h-5 text-[rgb(23,115,81)]" />
+                      ) : (
+                        <Circle className="w-5 h-5 text-gray-300" />
+                      )}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-sm font-medium ${books[book.title] ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                        {book.title}
+                      </div>
+                      <div className="text-xs text-gray-500">{book.author}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (viewMode === 'calendar') {
+        const monthCalendar = generateMonthCalendar();
+        const monthName = calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-2">
+            <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-3">
+              <div className="flex items-center justify-between mb-3">
+                <h1 className="text-lg font-bold text-gray-800">Four444 Calendar</h1>
+                <div className="flex gap-2">
+                  <button onClick={() => setViewMode('day')} className="p-2 bg-[rgb(30,73,160)] text-white rounded">
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setViewMode('goals')} className="p-2 bg-orange-600 text-white rounded">
+                    <Target className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setViewMode('books')} className="p-2 bg-pink-600 text-white rounded">
+                    <Book className="w-4 h-4" />
+                  </button>
+                  <button onClick={exportToExcel} className="p-2 bg-[rgb(23,115,81)] text-white rounded">
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs mb-3">
+                <div className="flex items-center gap-2 text-[rgb(30,73,160)]">
+                  <TrendingUp className="w-3 h-3" />
+                  <span className="font-bold">{getStreak()}d streak</span>
+                </div>
+                <div className="flex items-center gap-2 text-purple-600">
+                  <span className="font-bold">💼 {getFlexDaysRemaining()} flex days</span>
+                </div>
+                <div className="text-gray-600">
+                  <span className="font-bold">{getOvertimeBank()}m</span> overtime
+                </div>
+              </div>
+
+                <div className="flex items-center justify-between bg-[rgb(56,112,185)] bg-opacity-20 rounded p-2 mb-3">
+                <button onClick={() => changeCalendarMonth(-1)} className="p-1">
+                  <ChevronLeft className="w-5 h-5 text-[rgb(30,73,160)]" />
+                </button>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-sm font-semibold">{monthName}</span>
+                  <button onClick={goToCurrentMonth} className="px-2 py-1 bg-[rgb(30,73,160)] text-white text-xs rounded">
+                    Today
+                  </button>
+                </div>
+                <button onClick={() => changeCalendarMonth(1)} className="p-1">
+                  <ChevronRight className="w-5 h-5 text-[rgb(30,73,160)]" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="text-center text-xs font-semibold text-gray-600 py-1">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1">
+                {monthCalendar.map((week, weekIdx) => (
+                  <div key={weekIdx} className="grid grid-cols-7 gap-1">
+                    {week.map((dayInfo, dayIdx) => {
+                      let bgColor = 'bg-gray-100';
+                      let textColor = 'text-gray-400';
+                      let borderColor = '';
+                      
+                      if (dayInfo.isCurrentMonth) {
+                        textColor = 'text-gray-800';
+                        
+                        if (dayInfo.hasSpecialDate) {
+                          // Yellow box for special dates and holidays
+                          bgColor = 'bg-[rgb(210,174,68)]';
+                          textColor = 'text-black';
+                        } else if (dayInfo.isFlexDay) {
+                          bgColor = 'bg-[rgb(56,112,185)]';
+                        } else if (dayInfo.isWorkDay) {
+                          if (dayInfo.isComplete) {
+                            bgColor = 'bg-[rgb(23,115,81)]';
+                          } else {
+                            const today = new Date(getLocalDateString() + 'T00:00:00');
+                            const cellDate = new Date(dayInfo.date + 'T00:00:00');
+                            if (cellDate < today) {
+                              bgColor = 'bg-[rgb(200,64,82)]';
+                            } else {
+                              bgColor = 'bg-white';
+                            }
+                          }
+                        } else {
+                          bgColor = 'bg-gray-50';
+                        }
+                        
+                        if (dayInfo.isToday) {
+                          borderColor = 'ring-2 ring-[rgb(30,73,160)]';
+                        }
+                      }
+                      
+                      return (
+                        <div
+                          key={dayIdx}
+                          onClick={() => {
+                            if (dayInfo.isCurrentMonth) {
+                              setSelectedDate(dayInfo.date);
+                              setViewMode('day');
+                            }
+                          }}
+                          className={`${bgColor} ${textColor} ${borderColor} rounded p-2 cursor-pointer hover:opacity-80 transition-opacity min-h-[80px]`}
+                        >
+                          <div className="text-sm font-semibold mb-1">{dayInfo.day}</div>
+                          {dayInfo.isCurrentMonth && dayInfo.isWorkDay && (
+                            <div className="text-xs">
+                              <div className={`font-mono ${dayInfo.totalTime >= 300 ? 'text-[rgb(23,115,81)]' : 'text-gray-600'}`}>
+                                {dayInfo.totalTime}m
+                              </div>
+                            </div>
+                          )}
+                          {dayInfo.isCurrentMonth && dayInfo.specialDates && dayInfo.specialDates.length > 0 && (
+                            <div className="text-xs mt-1">
+                              {dayInfo.specialDates[0].split(' ')[0]}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-3 flex gap-3 text-xs flex-wrap">
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 bg-[rgb(23,115,81)] rounded"></div>
+                  <span>Complete</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 bg-[rgb(200,64,82)] rounded"></div>
+                  <span>Incomplete</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 bg-[rgb(56,112,185)] rounded"></div>
+                  <span>Flex Day</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 bg-[rgb(210,174,68)] rounded"></div>
+                  <span>Special Date</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-1">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex gap-1">
+              {isToday && (
+                <div className="flex flex-col flex-shrink-0 self-stretch">
+                  {Array.from({ length: 36 }).map((_, index) => {
+                    const isPast = index < currentTimeBlock;
+                    const isCurrent = index === currentTimeBlock;
+                    const hours = Math.floor(index * 40 / 60);
+                    const minutes = (index * 40) % 60;
+                    const timeLabel = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                    return (
+                      <div
+                        key={index}
+                        className={`w-9 flex-1 rounded-sm ${isPast ? 'bg-[rgb(200,64,82)]' : 'bg-[rgb(23,115,81)]'} ${isCurrent ? 'ring-1 ring-[rgb(30,73,160)]' : ''} flex items-center justify-center text-white text-[8px] font-mono`}
+                      >
+                        {timeLabel}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex-1 min-w-0 bg-white rounded-lg shadow-lg p-1.5 flex flex-col">
+                {showFinanceModal && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg p-4 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                      <div className="flex items-center justify-between mb-3">
+                        <h2 className="text-lg font-bold text-gray-800">Finance Tracker</h2>
+                        <button
+                          onClick={() => {
+                            setShowFinanceModal(false);
+                            setCurrentFinanceData({
+                              emergencyFund: '',
+                              lisa: '',
+                              isa: '',
+                              sipp: '',
+                              gia: '',
+                              creditCard: '',
+                              mortgage: ''
+                            });
+                          }}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
+                          <X className="w-4 h-4 text-gray-600" />
+                        </button>
+                      </div>
+                      
+                      <div className="mb-2 text-center bg-blue-50 rounded p-2">
+                        <div className="text-xs text-gray-600">Target</div>
+                        <div className="text-lg font-bold text-[rgb(30,73,160)]">£{financeTarget.toLocaleString()}</div>
+                      </div>
+
+                      <div className="space-y-2 mb-3">
+                        <h3 className="text-sm font-bold text-[rgb(23,115,81)]">Assets</h3>
+                        
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Emergency Fund (£)</label>
+                          <input
+                            type="number"
+                            value={currentFinanceData.emergencyFund}
+                            onChange={(e) => setCurrentFinanceData(prev => ({...prev, emergencyFund: e.target.value}))}
+                            className="w-full px-2 py-1 text-sm border rounded outline-none"
+                            placeholder="0"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">LISA (£)</label>
+                          <input
+                            type="number"
+                            value={currentFinanceData.lisa}
+                            onChange={(e) => setCurrentFinanceData(prev => ({...prev, lisa: e.target.value}))}
+                            className="w-full px-2 py-1 text-sm border rounded outline-none"
+                            placeholder="0"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">ISA (£)</label>
+                          <input
+                            type="number"
+                            value={currentFinanceData.isa}
+                            onChange={(e) => setCurrentFinanceData(prev => ({...prev, isa: e.target.value}))}
+                            className="w-full px-2 py-1 text-sm border rounded outline-none"
+                            placeholder="0"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">SIPP (£)</label>
+                          <input
+                            type="number"
+                            value={currentFinanceData.sipp}
+                            onChange={(e) => setCurrentFinanceData(prev => ({...prev, sipp: e.target.value}))}
+                            className="w-full px-2 py-1 text-sm border rounded outline-none"
+                            placeholder="0"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">GIA (£)</label>
+                          <input
+                            type="number"
+                            value={currentFinanceData.gia}
+                            onChange={(e) => setCurrentFinanceData(prev => ({...prev, gia: e.target.value}))}
+                            className="w-full px-2 py-1 text-sm border rounded outline-none"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <h3 className="text-sm font-bold text-[rgb(200,64,82)]">Liabilities</h3>
+                        
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Credit Card (£)</label>
+                          <input
+                            type="number"
+                            value={currentFinanceData.creditCard}
+                            onChange={(e) => setCurrentFinanceData(prev => ({...prev, creditCard: e.target.value}))}
+                            className="w-full px-2 py-1 text-sm border rounded outline-none"
+                            placeholder="0"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold mb-1">Mortgage (£)</label>
+                          <input
+                            type="number"
+                            value={currentFinanceData.mortgage}
+                            onChange={(e) => setCurrentFinanceData(prev => ({...prev, mortgage: e.target.value}))}
+                            className="w-full px-2 py-1 text-sm border rounded outline-none"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={saveFinanceData}
+                          className="flex-1 px-3 py-2 bg-[rgb(23,115,81)] text-white text-sm rounded font-semibold"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowFinanceModal(false);
+                            setCurrentFinanceData({
+                              emergencyFund: '',
+                              lisa: '',
+                              isa: '',
+                              sipp: '',
+                              gia: '',
+                              creditCard: '',
+                              mortgage: ''
+                            });
+                          }}
+                          className="flex-1 px-3 py-2 bg-gray-400 text-white text-sm rounded font-semibold"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mb-1">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <h1 className="text-sm font-bold text-gray-800">Four444</h1>
+                    <div className="flex gap-1">
+                      <button onClick={() => setViewMode('calendar')} className="p-1 bg-purple-600 text-white rounded">
+                        <Grid className="w-3 h-3" />
+                      </button>
+                      <button onClick={() => setViewMode('goals')} className="p-1 bg-orange-600 text-white rounded">
+                        <Target className="w-3 h-3" />
+                      </button>
+                      <button onClick={() => setViewMode('books')} className="p-1 bg-pink-600 text-white rounded">
+                        <Book className="w-3 h-3" />
+                      </button>
+                      <button onClick={exportToExcel} className="p-1 bg-[rgb(23,115,81)] text-white rounded">
+                        <Download className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[9px]">
+                    {!isWorkDaySelected && (
+                      <div className="text-[rgb(56,112,185)] font-semibold">Day Off 🎉</div>
+                    )}
+                    <div className="flex items-center gap-1 text-[rgb(30,73,160)]">
+                      <TrendingUp className="w-2.5 h-2.5" />
+                      <span className="font-bold">{getStreak()}d</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-purple-600">
+                      <span className="font-bold">💼{getFlexDaysRemaining()}</span>
+                    </div>
+                  </div>
+                  <div className="mt-0.5">
+                    {isNaturalWorkDay(selectedDate) && !trackedData[selectedDate]?.flexDayOff && getFlexDaysRemaining() > 0 && (
+                      <button 
+                        onClick={toggleFlexDayOff}
+                        className="w-full text-[9px] bg-purple-100 hover:bg-purple-200 rounded p-0.5"
+                      >
+                        Use Flex Day
+                      </button>
+                    )}
+                    {trackedData[selectedDate]?.flexDayOff && (
+                      <button 
+                        onClick={toggleFlexDayOff}
+                        className="w-full text-[9px] bg-orange-100 hover:bg-orange-200 rounded p-0.5"
+                      >
+                        Cancel Flex Day
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mb-1.5 overflow-x-auto">
+                  <div className="flex gap-0.5 pb-0.5">
+                    {calendarDays.map((day) => {
+                      const dayDate = new Date(day.date + 'T00:00:00');
+                      const todayDate = new Date(getLocalDateString() + 'T00:00:00');
+                      const isPast = dayDate < todayDate;
+                      
+                      let boxClass, textClass;
+                      
+                      if (day.hasSpecialDate) {
+                        // Yellow box for special dates and holidays
+                        boxClass = 'bg-[rgb(210,174,68)]';
+                        textClass = 'text-black';
+                      } else if (day.isComplete) {
+                        boxClass = 'bg-[rgb(23,115,81)]';
+                        textClass = 'text-white';
+                      } else {
+                        boxClass = 'bg-[rgb(200,64,82)]';
+                        textClass = 'text-white';
+                      }
+                      
+                      let ringClass = '';
+                      if (day.isToday) {
+                        ringClass = 'ring-2 ring-[rgb(23,115,81)]';
+                      }
+                      
+                      return (
+                        <div 
+                          key={day.date} 
+                          onClick={() => setSelectedDate(day.date)} 
+                          className={`w-5 h-5 rounded cursor-pointer flex items-center justify-center text-[9px] font-medium ${ringClass} ${boxClass} ${textClass}`}
+                        >
+                          {day.display}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="mb-1.5 flex items-center justify-between bg-[rgb(56,112,185)] bg-opacity-20 rounded p-0.5">
+                  <button onClick={() => changeDate(-1)} className="p-0.5"><ChevronLeft className="w-3 h-3 text-[rgb(30,73,160)]" /></button>
+                  <div className="flex items-center gap-0.5">
+                    <Calendar className="w-2.5 h-2.5" />
+                    <span className="text-[9px] font-semibold">{new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    {!isToday && (<button onClick={goToToday} className="px-1 py-0.5 bg-[rgb(30,73,160)] text-white text-[8px] rounded">Now</button>)}
+                  </div>
+                  <button onClick={() => changeDate(1)} className="p-0.5"><ChevronRight className="w-3 h-3 text-[rgb(30,73,160)]" /></button>
+                </div>
+
+                {(() => {
+                  const financeData = getFinanceData(selectedDate);
+                  const netValue = financeData ? calculateNetValue(financeData) : null;
+                  const distanceFromTarget = netValue !== null ? netValue - financeTarget : null;
+                  
+                  return (
+                    <div className="mb-1.5">
+                      {netValue !== null ? (
+                        <div className="bg-green-50 border border-green-200 rounded p-1">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <div className="text-[9px] font-bold text-gray-700">
+                              £{netValue.toLocaleString()}/£{financeTarget.toLocaleString()}
+                            </div>
+                            <button onClick={openFinanceModal} className="px-2 py-1 bg-[rgb(30,73,160)] text-white text-[7px] rounded">
+                              Edit
+                            </button>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-1 mb-0.5">
+                            {netValue < 0 ? (
+                              <div className="bg-[rgb(200,64,82)] h-1 rounded-full" style={{ width: `${Math.min(Math.abs(netValue) / financeTarget * 100, 100)}%` }}></div>
+                            ) : (
+                              <div className="bg-[rgb(23,115,81)] h-1 rounded-full" style={{ width: `${Math.min((netValue / financeTarget) * 100, 100)}%` }}></div>
+                            )}
+                          </div>
+                          {distanceFromTarget !== null && (
+                            <div className={`text-[8px] font-semibold ${distanceFromTarget >= 0 ? 'text-[rgb(23,115,81)]' : 'text-[rgb(200,64,82)]'}`}>
+                              {distanceFromTarget >= 0 ? '+' : ''}£{distanceFromTarget.toLocaleString()} from target
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <button onClick={openFinanceModal} className="w-full px-2 py-1 bg-green-100 hover:bg-green-200 text-green-800 text-[9px] rounded font-semibold">
+                          + Add Finance Data
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {getSpecialDates(selectedDate).length > 0 && (
+                  <div className="mb-1.5 bg-pink-50 border border-pink-200 rounded p-1">
+                    {getSpecialDates(selectedDate).map((specialDate, idx) => (
+                      <div key={idx} className="text-[9px] text-pink-800 font-medium">
+                        {specialDate}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {isWorkDaySelected && (
+                  <div className="mb-1.5 bg-[rgb(56,112,185)] bg-opacity-20 rounded p-1">
+                    <div className="flex justify-between text-[9px] mb-0.5">
+                      <span className={timeComplete ? 'text-[rgb(23,115,81)] font-bold' : ''}>{totalTime}/300</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1 mb-1">
+                      <div className="bg-[rgb(30,73,160)] h-1 rounded-full" style={{ width: `${Math.min((totalTime / 300) * 100, 100)}%` }}></div>
+                    </div>
+                    {totalTime > 288 && (
+                      <div className="text-[8px] text-purple-600">
+                        +{totalTime - 288} m overtime ({288 - getOvertimeProgress()} minutes to next flex day)
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="mb-1.5">
+                  <div className="flex gap-0.5">
+                    <input type="text" placeholder="Daily note..." value={dailyNote} onChange={(e) => setDailyNote(e.target.value)} className="flex-1 px-1 py-0.5 text-[9px] border rounded outline-none" />
+                    <button onClick={updateDailyNote} className="px-1.5 py-0.5 rounded flex items-center justify-center" style={{ backgroundColor: 'rgb(242, 182, 4)' }}>
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </button>
+                  </div>
+                  {getDateData(selectedDate).dailyNote && (
+                    <div className="mt-0.5 bg-[rgb(56,112,185)] bg-opacity-20 rounded p-0.5">
+                      <div className="flex items-start gap-0.5">
+                        <div className="flex-1 text-[8px] italic">"{getDateData(selectedDate).dailyNote}"</div>
+                        <button onClick={editDailyNote} className="px-1 py-0.5 bg-[rgb(30,73,160)] text-white text-[7px] rounded">Edit</button>
+                        <button onClick={deleteDailyNote} className="px-1 py-0.5 bg-[rgb(200,64,82)] text-white text-[7px] rounded">Del</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {isWorkDaySelected ? (
+                  <div className="space-y-1.5 flex-1">
+                    {visibleHabits.map((habit, index) => {
+                      const complete = isHabitComplete(habit.id, selectedDate);
+                      const dateData = getDateData(selectedDate);
+                      const habitTime = dateData[`time${habit.id}`] || 0;
+                      const habitNote = dateData[`note${habit.id}`] || '';
+                      const isTimerRunning = timers[habit.id] || false;
+                      const timerElapsed = elapsedSeconds[habit.id] || 0;
+                      const isWeeklyTask = habit.type === 'weekly';
+                      const canMoveUp = index > 0;
+                      const canMoveDown = index < visibleHabits.length - 1;
+
+                      return (
+                        <div key={habit.id} className="border rounded p-1">
+                          <div className="flex items-start gap-1">
+                            <div className="mt-0.5">{complete ? <CheckCircle className="w-3 h-3 text-[rgb(23,115,81)]" /> : <Circle className="w-3 h-3 text-gray-300" />}</div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-0.5">
+                                <h3 className="text-[10px] font-semibold">{habit.name}</h3>
+                                {isToday && (
+                                  <div className="flex gap-0.5">
+                                    <button 
+                                      onClick={() => moveTaskUp(habit.id)} 
+                                      disabled={!canMoveUp}
+                                      className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-30 disabled:hover:bg-gray-100"
+                                    >
+                                      <ChevronUp className="w-2.5 h-2.5 text-gray-600" />
+                                    </button>
+                                    <button 
+                                      onClick={() => moveTaskDown(habit.id)} 
+                                      disabled={!canMoveDown}
+                                      className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-30 disabled:hover:bg-gray-100"
+                                    >
+                                      <ChevronDown className="w-2.5 h-2.5 text-gray-600" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <div className="mb-0.5">
+                                {!complete ? (
+                                  <button onClick={() => updateHabit(habit.id)} className="w-full px-1 py-0.5 bg-[rgb(30,73,160)] text-white text-[9px] rounded">Done</button>
+                                ) : (
+                                  <div className="flex gap-0.5">
+                                    <div className="flex-1 px-1 py-0.5 bg-[rgb(23,115,81)] bg-opacity-20 text-[rgb(23,115,81)] text-[9px] rounded text-center">✓ Complete</div>
+                                    <button onClick={() => deleteTask(habit.id)} className="px-1 py-0.5 bg-[rgb(200,64,82)] text-white text-[7px] rounded">Del</button>
+                                  </div>
+                                )}
+                              </div>
+
+                              {!isWeeklyTask && (
+                                <>
+                                  <div className="bg-purple-50 rounded p-0.5 mb-0.5">
+                                    <div className="flex justify-between items-center mb-0.5">
+                                      <span className="text-[9px] font-mono font-bold text-purple-700">{formatTime(timerElapsed, habit.id)}</span>
+                                    </div>
+                                    <div className="flex gap-0.5">
+                                      {!isTimerRunning ? (
+                                        <button onClick={() => startTimer(habit.id)} className="flex-1 flex items-center justify-center px-0.5 py-0.5 bg-[rgb(23,115,81)] text-white rounded text-[8px]"><Play className="w-2 h-2" /></button>
+                                      ) : (
+                                        <button onClick={() => pauseTimer(habit.id)} className="flex-1 flex items-center justify-center px-0.5 py-0.5 bg-[rgb(182,135,50)] text-white rounded text-[8px]"><Pause className="w-2 h-2" /></button>
+                                      )}
+                                      <button onClick={() => stopTimer(habit.id)} disabled={timerElapsed === 0} className="flex-1 flex items-center justify-center px-0.5 py-0.5 bg-[rgb(200,64,82)] text-white rounded text-[8px] disabled:opacity-50"><Square className="w-2 h-2" /></button>
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-gray-50 rounded p-0.5 mb-0.5">
+                                    <div className="text-[8px] mb-0.5">
+                                      <span className="font-medium">{habitTime}m</span>
+                                    </div>
+                                    {!complete && (
+                                      <div className="flex gap-0.5 mb-0.5">
+                                        <input type="time" value={currentStartTimes[habit.id] || ''} onChange={(e) => setCurrentStartTimes(prev => ({ ...prev, [habit.id]: e.target.value }))} className="flex-1 px-0.5 py-0.5 text-[8px] border rounded outline-none" />
+                                        <input type="time" value={currentEndTimes[habit.id] || ''} onChange={(e) => setCurrentEndTimes(prev => ({ ...prev, [habit.id]: e.target.value }))} className="flex-1 px-0.5 py-0.5 text-[8px] border rounded outline-none" />
+                                        <button onClick={() => updateTime(habit.id)} className="px-1 py-0.5 bg-gray-600 text-white text-[8px] rounded">+</button>
+                                      </div>
+                                    )}
+                                    {dateData[`timeEntries${habit.id}`] && dateData[`timeEntries${habit.id}`].length > 0 && (
+                                      <div className="space-y-0.5">
+                                        {dateData[`timeEntries${habit.id}`].map((entry, idx) => (
+                                          <div key={idx} className="flex items-center justify-between text-[7px] bg-white rounded px-0.5 py-0.5">
+                                            <span>{entry.start} - {entry.end} ({entry.minutes}m)</span>
+                                            {!complete && (
+                                              <button onClick={() => deleteTimeEntry(habit.id, idx)} className="px-1 py-0.5 bg-[rgb(200,64,82)] text-white rounded">×</button>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+
+                              <div className="bg-amber-50 rounded p-0.5">
+                                {habitNote && (
+                                  <div className="mb-0.5 bg-white rounded p-0.5">
+                                    <div className="flex items-start gap-0.5">
+                                      <div className="flex-1 text-[8px] italic">"{habitNote}"</div>
+                                      {!complete && (
+                                        <div className="flex gap-0.5">
+                                          <button onClick={() => editNote(habit.id)} className="px-1 py-0.5 bg-[rgb(30,73,160)] text-white text-[7px] rounded">Edit</button>
+                                          <button onClick={() => deleteNote(habit.id)} className="px-1 py-0.5 bg-[rgb(200,64,82)] text-white text-[7px] rounded">Del</button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                {!complete && (
+                                  <div className="flex gap-0.5">
+                                    <input type="text" placeholder="Note..." value={currentNotes[habit.id] || ''} onChange={(e) => setCurrentNotes(prev => ({ ...prev, [habit.id]: e.target.value }))} className="flex-1 px-0.5 py-0.5 text-[8px] border rounded outline-none" />
+                                    <button onClick={() => updateNote(habit.id)} className="px-1.5 py-0.5 rounded flex items-center justify-center" style={{ backgroundColor: 'rgb(242, 182, 4)' }}>
+                                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <div className="text-2xl">🎉</div>
+                    <h3 className="text-xs font-semibold text-gray-600">Day Off</h3>
+                  </div>
+                )}
+
+                {isWorkDaySelected && allDailyComplete && timeComplete && (
+                  <div className="mt-1.5 bg-[rgb(23,115,81)] bg-opacity-20 border border-[rgb(23,115,81)] rounded p-1 text-center">
+                    <div className="text-lg">🎉</div>
+                    <h3 className="text-[9px] font-bold text-[rgb(23,115,81)]">Daily Tasks Done!</h3>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<HabitTracker />, document.getElementById('root'));
+  </script>
+</body>
+</html>
